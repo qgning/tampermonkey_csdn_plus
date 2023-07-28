@@ -5,34 +5,22 @@ async function main() {
   // GM_addStyle(".passport-login-container{display:none!important;}");
 
   // 设置文字为可选
-  GM_addStyle("\
-#content_views {\
-  -webkit-touch-callout: auto;\
-  -webkit-user-select: auto;\
-  -khtml-user-select: auto;\
-  -moz-user-select: auto;\
-  -ms-user-select: auto;\
-  user-select: auto;\
-  !important;\
-#content_views pre {\
-  -webkit-touch-callout: auto;\
-  -webkit-user-select: auto;\
-  -khtml-user-select: auto;\
-  -moz-user-select: auto;\
-  -ms-user-select: auto;\
-  user-select: auto;\
-  !important;\
-}\
-#content_views pre code {\
-  -webkit-touch-callout: auto;\
-  -webkit-user-select: auto;\
-  -khtml-user-select: auto;\
-  -moz-user-select: auto;\
-  -ms-user-select: auto;\
-  user-select: auto;\
-  !important;\
-}\
-")
+  function style_selectable(selector: string): string {
+    return selector + " {\
+    -webkit-touch-callout: auto;\
+    -webkit-user-select: auto;\
+    -khtml-user-select: auto;\
+    -moz-user-select: auto;\
+    -ms-user-select: auto;\
+    user-select: auto;\
+    !important;\
+  }"
+  }
+  GM_addStyle(
+    style_selectable('#content_views')
+    + style_selectable('#content_views pre')
+    + style_selectable('#content_views pre code')
+  )
 
   // 删除页面的ID，使其不关联相关事件
   //document.getElementById('content_views')?.setAttribute('id','')
