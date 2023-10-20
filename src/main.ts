@@ -32,7 +32,8 @@ async function main() {
   document.querySelectorAll('.pre-numbering')?.forEach(e => e.removeAttribute('style')) // 显示由于clone blog-content-box导致的代码行号动画未执行而不显示
 
   // 展开折叠的代码
-  document.querySelectorAll('.set-code-hide').forEach(e => e.classList.remove('set-code-hide')) //移除折叠样式
+  // test: 需要展开代码的网址 https://blog.csdn.net/lxlyx11/article/details/124961664
+  document.querySelectorAll('.set-code-hide').forEach(e => e.classList.replace('set-code-hide', 'set-code-show')) //移除折叠样式
   document.querySelectorAll('.hide-preCode-box').forEach(e => e.remove())   //移除下拉箭头
 
   // 遍历登陆复制按钮并修改属性
@@ -57,6 +58,7 @@ async function main() {
   }
 
   // 展开需要关注博主阅读全文的内容
+  // test: 需要订阅专栏的网址 https://blog.csdn.net/uote_e/article/details/131385801
   document.getElementById('article_content')?.removeAttribute("style")
   document.getElementsByClassName('hide-article-box')[0]?.remove()
 }
