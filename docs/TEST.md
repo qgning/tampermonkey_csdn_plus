@@ -12,6 +12,9 @@ https://www.csdn.net/
 - https://blog.csdn.net/johnsong2009/article/details/163989735
 - https://blog.csdn.net/2501_93835954/article/details/162914319
 
+## 有代码部分折叠
+- https://blog.csdn.net/weixin_42499004/article/details/144423689
+
 ### VIP文章
 - https://blog.csdn.net/weixin_32349093/article/details/163519722
 - https://blog.csdn.net/m0_61278502/article/details/145624530
