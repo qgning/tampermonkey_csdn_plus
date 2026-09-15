@@ -74,10 +74,10 @@ function noop() {
 }
 // 读取原始源码，保持业务实现不变。
 const source = readFileSync(new URL('./main.ts', import.meta.url), 'utf8');
-// 只替换油猴导入，以便隔离执行实际实现。
-const compiled = ts.transpile(source.replace(/^import .* from '\$'\r?\n/m, ''), { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None });
-// 执行源码并等待入口完成。
-await runInNewContext(compiled, { document: { querySelector, querySelectorAll, getElementsByClassName, getElementById }, GM_addStyle: captureStyle, GM_setClipboard: captureClipboard, clearTimeout: noop, setTimeout: noop, console });
+// 移除模块导入，新拦截器由独立测试覆盖。
+const compiled = ts.transpile(source.replace(/^import .* from .*\r?\n/gm, ''), { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None });
+// 模拟页面已加载，仅验证原有文章增强逻辑。
+await runInNewContext(compiled, { document: { readyState: 'complete', querySelector, querySelectorAll, getElementsByClassName, getElementById }, unsafeWindow: {}, installLoginGuard: noop, GM_addStyle: captureStyle, GM_setClipboard: captureClipboard, clearTimeout: noop, setTimeout: noop, console });
 // 调用源码实际注册的点击处理器。
 handlers.get('click')({ stopPropagation: noop });
 // 确认已复现复制工具栏而非代码正文的缺陷。

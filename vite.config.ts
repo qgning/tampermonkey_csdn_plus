@@ -8,6 +8,8 @@ export default defineConfig({
     monkey({
       entry: 'src/main.ts',
       userscript: {
+        // 在页面脚本执行前安装自动登录拦截。
+        'run-at': 'document-start',
         name: {
           '':'csdn_plus',
         },
@@ -27,7 +29,10 @@ export default defineConfig({
         ],
         grant: [
           'GM_addStyle',
-          'GM_setClipboard'
+          // 保留剪贴板权限。
+          'GM_setClipboard',
+          // 允许包装网页自身的登录组件。
+          'unsafeWindow'
         ],
         license: 'BSD'
       },
