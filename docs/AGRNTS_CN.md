@@ -7,7 +7,7 @@
 - 系统架构设计放在docs/ARCHITECTURE.md
 - 详细设计放在docs/DESIGN.md
 - 测试资料放在docs/TEST.md
-- 生成的文档放在docs/codex中，源码放入src中
+- 生成的文档放在docs/codex中，源码放入src中，编译结果放入outputs中
 
 ## 注释要求
 - 在不影响代码运行的前提下才可以添加注释
@@ -20,9 +20,8 @@
 - 提交前要再次检查注释规范
 - 不将人工编写的整个文件或函数错误声明为由 Codex 生成
 - 保留已有版权、许可证和其他有效的来源声明
-- .gitignore要检查是否有遗漏的部分，不要将中间文件添加到git
+- .gitignore检查，不要将中间文件和编译结果添加到git
 - 将项目的最新编译方式和用法要补充说明在readme.md
-
 
 ## 测试要求
 - 将当前版本的测试报告放在docs/codex/test-report.md，并删除有关上个版本的测试内容

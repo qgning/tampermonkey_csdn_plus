@@ -7,7 +7,7 @@
 - Architecture: `docs/ARCHITECTURE.md`
 - Detailed design: `docs/DESIGN.md`
 - Testing: `docs/TEST.md`
-- Place generated documents in `docs/codex/` and source code in `src/`.
+- Place generated documents in `docs/codex/,  source code in `src/` build artifacts in outputs
 
 ## Code and Documentation
 - Add comments only when they do not affect runtime behavior.
@@ -20,7 +20,7 @@
 - Recheck compliance with the comment requirements.
 - Do not mislabel entire human-written files or functions as Codex-generated.
 - Preserve existing copyright, license, and valid attribution notices.
-- Check `.gitignore` for missing entries and keep intermediate files out of Git.
+- Check .gitignore to ensure that intermediate files and build artifacts are not added to Git.
 - Update `readme.md` with the latest build and usage instructions.
 
 ## Testing
