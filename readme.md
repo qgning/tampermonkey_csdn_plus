@@ -13,44 +13,38 @@
 
 ## 构建与使用
 
-仓库锁文件使用 pnpm 8 格式。2026-09-15 已在 Node.js 24.19.0、pnpm 8.15.9 下通过构建；较新的 pnpm 可能拒绝此锁文件。
+当前版本：`0.0.7`。使用 Node.js 24.19.0、pnpm 8.15.9 验证；仓库锁文件为 pnpm 8 格式。
 
 1. 安装依赖：`pnpm dlx pnpm@8.15.9 install --frozen-lockfile`。
-2. 构建脚本：`pnpm dlx pnpm@8.15.9 run build`。
-3. 将生成的 `dist/tampermonkey_csdn_plus.user.js` 导入浏览器 Tampermonkey 扩展，启用后刷新 CSDN 文章页。
-4. 开发调试：`pnpm dlx pnpm@8.15.9 run dev`，按 Vite 输出访问开发入口。
+2. 构建：`pnpm dlx pnpm@8.15.9 run build`。
+3. 校验：`node src/verify-release.mjs`。
+4. 将 `dist/tampermonkey_csdn_plus.user.js` 导入 Tampermonkey 并刷新文章页，或从 [最新 Release](https://github.com/qgning/tampermonkey_csdn_plus/releases/latest) 安装附件。
+5. 开发：`pnpm dlx pnpm@8.15.9 run dev`。
 
-脚本匹配 CSDN 博客文章详情页，不匹配 CSDN 首页。
+Vite 生成临时产物到 `dist/`，发布附件复制到 `outputs/`；两个目录均不提交 Git。脚本匹配 CSDN 文章详情页，不匹配首页；运行于 `document-start`，使用 `GM_addStyle`、`GM_setClipboard` 和 `unsafeWindow` 权限。
+
+## 0.0.7 更新
+
+- 复制按钮读取所属代码块，保留渲染换行，避免复制“AI写代码／运行”工具栏文案；文档捕获监听兼容动态替换按钮。
+- 修复文本选择 CSS 的 `!important` 写法。
+- 保留付费文章原始阅读入口、正文样式和事件，不强制展开付费内容。
+- 保留自动登录拦截，真实点击“登录／注册”可在 1.5 秒内放行一次非自动调用。
 
 ## 测试与发布
 
-当前版本为 `0.0.6`。仓库目前没有自动发布工作流，使用 GitHub CLI 手动发布。
+运行 `node src/login-guard.test.mjs` 和 `node src/audit-current.mjs`，再构建并运行 `node src/verify-release.mjs`。
 
-1. 运行 `node src/login-guard.test.mjs` 验证登录拦截策略。
-2. 运行 `pnpm dlx pnpm@8.15.9 run build`，再运行 `node src/verify-release.mjs` 校验版本与油猴元数据，生成 `dist/SHA256SUMS`。
-3. 将 `dist/tampermonkey_csdn_plus.user.js` 和 `dist/SHA256SUMS` 复制到 `outputs/`，保持发布附件与已提交文件一致。
-4. 提交并推送代码，创建同版本标签 `v0.0.6`，再用 `gh release create` 上传 `outputs/` 中的两个文件。版本标签必须与 package.json 一致，已公开版本不要复用或覆盖。
+可选浏览器回归使用 Playwright 和本机 Edge。在独立目录安装测试依赖（不修改项目锁文件）：
 
-发布附件固定命名为 `tampermonkey_csdn_plus.user.js`，以兼容现有脚本的 updateURL / downloadURL。用户可从 GitHub 最新 Release 下载，也可直接安装 `outputs/tampermonkey_csdn_plus.user.js`。
+```powershell
+New-Item -ItemType Directory -Force outputs/browser-runtime
+pnpm dlx pnpm@8.15.9 add playwright@1.63.0 --dir outputs/browser-runtime
+$env:PLAYWRIGHT_PATH=(Resolve-Path outputs/browser-runtime/node_modules/playwright).Path
+node src/browser-regression.mjs
+```
 
-本地构建和模拟测试不代表 CSDN 浏览器功能验收通过；`node src/audit-current.mjs` 用于复现既有缺陷，其成功退出不表示功能正常。
+浏览器检查使用新的无 Cookie 上下文，结果写入 `outputs/browser-results.json`。构建脚本注入浏览器并模拟油猴样式／剪贴板 API，不能替代 Tampermonkey 扩展安装及系统剪贴板验收；目标文章不可访问时退出非零。
 
-## 当前兼容性检查
+发布时将 `dist/tampermonkey_csdn_plus.user.js`、`dist/SHA256SUMS` 复制至 `outputs/`，提交并推送源码，创建与 package.json 一致的 `v0.0.7` 标签，使用 `gh release create` 上传这两个附件。固定附件名兼容油猴更新地址；不要复用已发布版本。
 
-0.0.6 新增付费文章入口保护，并保留自动登录拦截。更新 Tampermonkey 中的脚本后刷新文章页生效；新增 `unsafeWindow` 权限用于包装页面登录组件，运行时机为 `document-start`。文章增强功能仍等待页面加载后执行。
-
-拦截覆盖当前 CSDN `loginBox.show / key / showTip / showAutoTip`。只有真实点击带“登录／注册”文字或无障碍名称的入口，才会在 1.5 秒内放行一次未标记为自动的调用；键盘激活按钮产生的点击同样适用。直接跳转登录页的链接保持正常。仅有无标签图标、超过 1.5 秒的异步登录、未来新增的独立组件或不允许改写的属性需要进一步适配，不保证覆盖任意站点改版。
-
-验证拦截策略：`node src/login-guard.test.mjs`。这是隔离模拟测试，真实浏览器油猴验收尚未完成。
-
-原有一键复制读取工具栏节点和 CSS 优先级写法错误的问题仍待修复。付费文章现在保留阅读入口。构建成功不代表线上功能全部可用。
-
-检查详情与尚未验证项目见 [当前测试报告](docs/codex/test-report.md)，后续方案见 [检查与修复方案](docs/codex/DESIGN.md)。使用 `node src/audit-current.mjs` 可验证付费入口保留并复现两个既有源码问题；这是局部模拟检查，不是浏览器验收测试。
-
-## 0.0.6 付费文章行为
-
-遇到“最低0.47元/天 解锁文章”等充值 VIP、购买或订阅后阅读的入口时，保留原始按钮、遮罩及正文样式，不强制展开。保护检查发生在正文克隆之前，因此保留按钮原有事件；这些页面也跳过代码展开和复制按钮改写。普通文章继续按原逻辑展开。
-
-检测兼容不换行空格、HTML 实体和不同价格，仅检查文章阅读遮罩。此判断不能证明全文是否已下发，付费提示出现时采用保守保留策略。
-
-安装本次修复：重新构建并将 dist/tampermonkey_csdn_plus.user.js 导入 Tampermonkey，或使用仓库 outputs 下的 0.0.6 脚本，随后刷新文章页。运行 `node src/audit-current.mjs` 验证付费入口保护；这仍是模拟 DOM 检查，真实浏览器验收尚未完成。
+2026-09-17 自动回归与构建通过；无 Cookie Edge 访问首页成功，6 个目标文章页均返回 HTTP 403，线上完整验收未完成。详见 [当前测试报告](docs/codex/test-report.md) 与 [设计方案](docs/codex/DESIGN.md)。
